@@ -8,11 +8,18 @@ from rest_framework.decorators import api_view
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.filters import SearchFilter
+from rest_framework.permissions import AllowAny
 
 #generic class based views
 class api_home_page(ListCreateAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializers
+    pagination_class = PageNumberPagination
+    filter_backends = [SearchFilter]
+    search_fields = ["title", "content", "author"]
+    # permission_classes =[AllowAny]
 
 class api_detail_page(RetrieveUpdateDestroyAPIView):
     queryset = Post.objects.all()
@@ -77,7 +84,7 @@ class mobile_home_page(APIView):
 class mobile_detail_page(APIView):
     def get(self, request, id):
         if request.method == "GET":
-            single_comment = Post.objects.get(id=id)
+            single_comment = Comment.objects.get(id=id)
             serialized_post = CommentSerializers(single_comment)
             return Response(serialized_post.data, status=status.HTTP_200_OK)
         
